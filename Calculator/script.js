@@ -4,8 +4,12 @@ function append(value) {
   display.value += value;
 }
 
-function clearDisplay() {
-  display.value = '';
+function append(value) {
+  if (value === '%') {
+    display.value += '/100';
+  } else {
+    display.value += value;
+  }
 }
 
 function calculate() {
