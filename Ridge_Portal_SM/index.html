@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ridge Household - Sales Portal</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="container" id="login-container">
+        <div class="login-box">
+            <div class="logo">
+                <img src="https://via.placeholder.com/150x50?text=Ridge+Household" alt="Ridge Household Logo">
+            </div>
+            <h2>Sales Portal Login</h2>
+            <form id="login-form">
+                <div class="input-group">
+                    <label for="username">Email or Phone</label>
+                    <input type="text" id="username" name="username" required>
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="input-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" required>
+                    <i class="fas fa-lock"></i>
+                </div>
+                <button type="submit" class="login-btn">Login</button>
+            </form>
+            <p class="forgot-password">Forgot password? <a href="#">Click here</a></p>
+        </div>
+    </div>
+
+    <div class="dashboard-container" id="dashboard-container" style="display: none;">
+        <header class="dashboard-header">
+            <div class="header-left">
+                <img src="https://via.placeholder.com/150x50?text=Ridge+Household" alt="Ridge Household Logo" class="dashboard-logo">
+                <h1>Sales Portal</h1>
+            </div>
+            <div class="header-right">
+                <span id="welcome-message">Welcome, Salesperson</span>
+                <button id="logout-btn" class="logout-btn">Logout <i class="fas fa-sign-out-alt"></i></button>
+            </div>
+        </header>
+
+        <main class="dashboard-main">
+            <div class="dashboard-cards">
+                <div class="card" id="sales-report-card">
+                    <div class="card-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3>Sales Report</h3>
+                    <p>Download today's sales report</p>
+                    <button class="card-btn" id="sales-report-btn">Access Report</button>
+                </div>
+
+                <div class="card" id="stock-data-card">
+                    <div class="card-icon">
+                        <i class="fas fa-boxes"></i>
+                    </div>
+                    <h3>Stock Data</h3>
+                    <p>View all stock information</p>
+                    <button class="card-btn" id="stock-data-btn">View Data</button>
+                </div>
+            </div>
+
+            <div class="content-section" id="sales-report-section" style="display: none;">
+                <div class="section-header">
+                    <h2><i class="fas fa-chart-line"></i> Sales Report</h2>
+                    <button class="back-btn" id="back-from-sales"><i class="fas fa-arrow-left"></i> Back to Dashboard</button>
+                </div>
+                <div class="file-list">
+                    <div class="file-item">
+                        <i class="fas fa-file-excel"></i>
+                        <div class="file-info">
+                            <h4>Daily Sales Report</h4>
+                            <p>Updated: <span id="sales-report-date">Today</span></p>
+                        </div>
+                        <a href="#" class="download-btn" id="download-sales-report">Download <i class="fas fa-download"></i></a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-section" id="stock-data-section" style="display: none;">
+                <div class="section-header">
+                    <h2><i class="fas fa-boxes"></i> Stock Data</h2>
+                    <button class="back-btn" id="back-from-stock"><i class="fas fa-arrow-left"></i> Back to Dashboard</button>
+                </div>
+                <div class="file-list">
+                    <div class="file-item">
+                        <i class="fas fa-file-alt"></i>
+                        <div class="file-info">
+                            <h4>Overall Stock Data</h4>
+                            <p>Complete inventory overview</p>
+                        </div>
+                        <a href="#" class="download-btn">Download <i class="fas fa-download"></i></a>
+                    </div>
+                    <div class="file-item">
+                        <i class="fas fa-file-alt"></i>
+                        <div class="file-info">
+                            <h4>DPH Stock Data</h4>
+                            <p>DPH product inventory</p>
+                        </div>
+                        <a href="#" class="download-btn">Download <i class="fas fa-download"></i></a>
+                    </div>
+                    <div class="file-item">
+                        <i class="fas fa-file-alt"></i>
+                        <div class="file-info">
+                            <h4>LHH Stock Data</h4>
+                            <p>LHH product inventory</p>
+                        </div>
+                        <a href="#" class="download-btn">Download <i class="fas fa-download"></i></a>
+                    </div>
+                    <div class="file-item">
+                        <i class="fas fa-file-alt"></i>
+                        <div class="file-info">
+                            <h4>HHH Stock Data</h4>
+                            <p>HHH product inventory</p>
+                        </div>
+                        <a href="#" class="download-btn">Download <i class="fas fa-download"></i></a>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer class="dashboard-footer">
+            <p>&copy; 2023 Ridge Household. All rights reserved.</p>
+            <p class="version">Version 1.0.0</p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
