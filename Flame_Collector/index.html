@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>FLAMES — Relationship Predictor</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-50 text-gray-900 min-h-screen flex items-center justify-center p-6">
+  <div class="max-w-xl w-full bg-white shadow rounded-lg p-6">
+    <h1 class="text-2xl font-semibold mb-4">FLAMES — Relationship Predictor</h1>
+
+    <p class="text-sm text-gray-600 mb-4">Enter two names. The website will tell whether they are Friend / Love / Affection / Marriage / Enemy / Sister (Bestie) according to the FLAMES algorithm. Each entry is logged to our Google Sheet for analytics.</p>
+
+    <div class="space-y-3">
+      <input id="name1" placeholder="Boy's name" class="w-full p-3 border rounded" />
+      <input id="name2" placeholder="Girl's name" class="w-full p-3 border rounded" />
+      <div class="flex gap-2">
+        <button id="checkBtn" class="flex-1 bg-blue-600 text-white p-3 rounded hover:bg-blue-700">Check</button>
+        <button id="clearBtn" class="flex-1 bg-gray-200 p-3 rounded hover:bg-gray-300">Clear</button>
+      </div>
+    </div>
+
+    <div id="resultBox" class="mt-6 hidden p-4 rounded border">
+      <div id="resultText" class="text-lg font-medium"></div>
+      <div id="explain" class="text-sm text-gray-600 mt-2"></div>
+    </div>
+
+    <div id="status" class="mt-4 text-sm text-gray-600"></div>
+  </div>
+
+<script>
+/*
+ FLAMES logic:
+ 1. Clean names (letters only, lowercase)
+ 2. Remove common letters between names
+ 3. Count remaining letters -> n
+ 4. Use n to eliminate letters from "FLAMES" cyclically until one letter remains
+ 5. Map final letter to relationship
+*/
+
+function cleanName(s){
+  return (s || '').toLowerCase().replace(/[^a-z]/g, '').trim();
+}
+
+// returns remaining letter count after removing common letters
+function remainingCount(a, b){
+  let arrA = a.split('');
+  let arrB = b.split('');
+  for (let i = arrA.length-1; i >= 0; i--){
+    const idx = arrB.indexOf(arrA[i]);
+    if (idx !== -1) {
+      arrA.splice(i,1);
+      arrB.splice(idx,1);
+    }
+  }
+  return arrA.length + arrB.length;
+}
+
+function flamesResult(n){
+  if (n === 0) return {code: 'S', label: 'Siblings / Best Friends (S)'};
+  let flames = ['F','L','A','M','E','S']; // Friend, Love, Affection, Marriage, Enemy, Siblings
+  let idx = 0;
+  while (flames.length > 1){
+    idx = (idx + n - 1) % flames.length;
+    flames.splice(idx, 1);
+    // next start is at idx (no +1)
+    if (idx === flames.length) idx = 0;
+  }
+  const map = {
+    'F': 'Friend',
+    'L': 'Love',
+    'A': 'Affection',
+    'M': 'Marriage',
+    'E': 'Enemy',
+    'S': 'Best Friends / Siblings'
+  };
+  return {code: flames[0], label: map[flames[0]] || 'Unknown'};
+}
+
+async function sendToSheet(payload, endpoint){
+  // endpoint is Google Apps Script webapp URL (doPost)
+  try {
+    const res = await fetch(endpoint, {
+      method: 'POST',
+      mode: 'cors',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify(payload)
+    });
+    return await res.json();
+  } catch (err) {
+    console.warn('Logging to sheet failed:', err);
+    return {ok:false, message: err.message};
+  }
+}
+
+document.getElementById('checkBtn').addEventListener('click', async () => {
+  const raw1 = document.getElementById('name1').value || '';
+  const raw2 = document.getElementById('name2').value || '';
+  const name1 = cleanName(raw1);
+  const name2 = cleanName(raw2);
+
+  if (!raw1.trim() || !raw2.trim()){
+    alert('Please enter both names.');
+    return;
+  }
+
+  const count = remainingCount(name1, name2);
+  const result = flamesResult(count);
+
+  // show
+  const box = document.getElementById('resultBox');
+  box.classList.remove('hidden');
+  document.getElementById('resultText').innerText = `${result.label}`;
+  document.getElementById('explain').innerText =
+    `Remaining letters after removing common chars: ${count}. FLAMES result code: ${result.code}.`;
+
+  // clear status then send to sheet
+  const statusEl = document.getElementById('status');
+  statusEl.textContent = 'Saving entry...';
+
+  // <-- PUT YOUR GOOGLE APPS SCRIPT WEB APP URL HERE -->
+  const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwUelk8hUaEZMfI09Zxvc1rN5bRKOE4hm11-q0vKe9UpQBQaCYfyZuZRk9mnrkIpuFD/execSSSSSSSSSSSSSS';
+
+  const payload = {
+    timestamp: new Date().toISOString(),
+    raw_name1: raw1,
+    raw_name2: raw2,
+    cleaned_name1: name1,
+    cleaned_name2: name2,
+    remaining_count: count,
+    flames_code: result.code,
+    flames_label: result.label,
+    page: location.pathname
+  };
+
+  if (APPS_SCRIPT_URL.includes('YOUR_SCRIPT_ID')) {
+    statusEl.textContent = 'Ready to log, but Apps Script URL is not configured. See instructions.';
+    return;
+  }
+
+  const resp = await sendToSheet(payload, APPS_SCRIPT_URL);
+  if (resp && resp.ok) {
+    statusEl.textContent = 'Entry saved to Google Sheet ✅';
+  } else {
+    statusEl.textContent = 'Saved locally (logging failed).';
+  }
+});
+
+document.getElementById('clearBtn').addEventListener('click', () => {
+  document.getElementById('name1').value = '';
+  document.getElementById('name2').value = '';
+  document.getElementById('resultBox').classList.add('hidden');
+  document.getElementById('status').textContent = '';
+});
+</script>
+</body>
+</html>
